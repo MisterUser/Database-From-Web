@@ -52,6 +52,8 @@ Window::Window(QWidget *parent)
     outputFileStream = new QTextStream(outputFile);
     *outputFileStream << "=======Habib's List=======\n\n";
     outputFileStream->flush();
+    label_for_besucht = dockWidget->findChild<QLabel*>("label_for_besucht");
+    besuchtCount = 0;
 }
 //! [Window constructor]
 
@@ -72,7 +74,6 @@ void Window::setUrl(const QUrl &url)
 //! [begin document inspection]
 void Window::on_webView_loadFinished()
 {
-    treeWidget->clear();
 
     QWebFrame *frame = webView->page()->mainFrame();
     QWebElement document = frame->documentElement();
@@ -83,31 +84,34 @@ void Window::on_webView_loadFinished()
 
 //! [traverse document]
 void Window::examineChildElements(const QWebElement &parentElement,
-                                  QTreeWidgetItem *parentItem)
+                                  QTreeWidgetItem *treeRoot) //was parentItem
 {
     QWebElement element = parentElement.firstChild();
     while (!element.isNull()) {
 
-        QTreeWidgetItem *item = new QTreeWidgetItem();
+
         if(element.tagName().compare("A") == 0)
         {
             if(element.attribute("href").contains("betrieb"))
             {
-                *outputFileStream << "Betrieb: " << element.toPlainText() << "\n";
-                outputFileStream->flush();
+                QTreeWidgetItem *item = new QTreeWidgetItem();
+                item->setText(0, element.toPlainText());
+                treeRoot->addChild(item);
                 parse_page(element.attribute("href"));
+
             }
-            //QTreeWidgetItem *linkItem2 = new QTreeWidgetItem();
-            //linkItem2->setText(0,element.attribute("href"));
-            //item->addChild(linkItem2);
-
+            if(element.toPlainText().contains("weiter"))
+            {
+                QString JS = element.attribute("href");
+                QThread::msleep(100);
+                element.evaluateJavaScript(JS);
+            }
         }
-        item->setText(0, element.tagName());
 
-        parentItem->addChild(item);
+        //parentItem->addChild(item);
 
         //subtrees
-        examineChildElements(element, item);
+        examineChildElements(element, treeRoot);
 
         //siblings (on same level)
         element = element.nextSibling();
@@ -115,85 +119,23 @@ void Window::examineChildElements(const QWebElement &parentElement,
 }
 //! [traverse document]
 
-
-
-
-
 void Window::parse_page(QString page_URL)
 {
-    //outputFileStream << outString;
-    setURL(page_URL);
-    QWebFrame *frameInner = webView->page()->mainFrame();
-    QWebElement documentBetrieb = frameInner->documentElement();
+    page_URL.prepend("http://www.hwk-do.de/");
+    InnerWindow * innerWin = new InnerWindow(QUrl(page_URL), outputFileStream, NULL);
+    connect(innerWin, SIGNAL(parsingFinished(InnerWindow*)), this, SLOT(on_parse_finished(InnerWindow*)));
+//    innerWin->close();
 
-    get_biz_info(documentBetrieb);
-
-    webView->back();
     return;
 }
 
-void Window::get_biz_info(const QWebElement &mainDOC)
-{
-    QWebElement element = mainDOC.firstChild(); //head
-    element.nextSibling();                        //body
-    QWebElement div1 = element.firstChild();        //div
-    QWebElement div2 = div1.firstChild();               //div
-    div2.nextSibling();                                 //div
-    div2.nextSibling();                                 //div
-    div2.nextSibling();                                 //div
-    QWebElement div3 = div2.firstChild();                   //div
-    QWebElement div4 = div3.firstChild();                       //div
-    QWebElement div5 = div4.firstChild();                           //div
-    div5.nextSibling();                                             //div
-    QWebElement div6 = div5.firstChild();                               //div
-    div6.nextSibling();                                                 //div
-    div6.nextSibling();                                                 //div
-    div6.nextSibling();                                                 //div
-    QWebElement div7 = div6.firstChild();                                   //div
-    QWebElement div8 = div7.firstChild();                                       //script
-    div8.nextSibling();                                                         //table
-    QWebElement div9 = div8.firstChild();                                           //form
-    div9.nextSibling();                                                             //tbody
-    QWebElement div10 = div9.firstChild();                                              //tr
-    div10.nextSibling();                                                                //tr
-    QWebElement div11 = div10.firstChild();                                                 //td
-    QWebElement div12 = div11.firstChild();                                                     //span
 
-    *outputFileStream << "-------------------------------------- "<< "\n";
-    *outputFileStream << "Betrieb: " << div12.toPlainText() << "\n";
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //string
-    *outputFileStream << "Addresse: " << div12.toPlainText() << "\n";
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //string
-    *outputFileStream << "PLZ und ORT: " << div12.toPlainText() << "\n";
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //span
-    div12.nextSibling();                                                                        //br
-    QWebElement innerTable = div12.firstChild();                                                //table
-    QWebElement innerTableBody = innerTable.firstChild();                                           //tbody
-    QWebElement tr_tag = innerTableBody.firstChild();                                                   //tr
-    QWebElement td_tag = tr_tag.firstChild();                                                               //td
-    td_tag.nextSibling();                                                                                   //td
-    *outputFileStream << "Telefon: " << td_tag.toPlainText() << "\n";
-    tr_tag.nextSibling();                                                                               //tr
-    td_tag = tr_tag.firstChild();                                                                           //td
-    td_tag.nextSibling();                                                                                   //td
-    QWebElement a_link = td_tag.firstChild();                                                                   //a
-    *outputFileStream << "Homepage: " << a_link.toPlainText() << "\n";
-    tr_tag.nextSibling();                                                                               //tr
-    td_tag = tr_tag.firstChild();                                                                           //td
-    td_tag.nextSibling();                                                                                   //td
-    QWebElement a_link = td_tag.firstChild();                                                                   //a
-    *outputFileStream << "E-mail: " << a_link.toPlainText() << "\n";
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //span
-    div12.nextSibling();                                                                        //br
-    div12.nextSibling();                                                                        //string
-    *outputFileStream << "Gewerk: " << div12.toPlainText() << "\n";
-    *outputFileStream << "-------------------------------------- "<< "\n\n";
-    outputFileStream->flush();
+void Window::on_parse_finished(InnerWindow* innerWin)
+{
+
+    innerWin->deleteLater();
+    *outputFileStream << "---------------"<<besuchtCount<<"------------------ "<< "\n\n";
+    label_for_besucht->setText("Besucht: " + QString::number(++besuchtCount));
     return;
 }
 

@@ -46,6 +46,8 @@
 #include <QWebElement>
 #include <QtWidgets>
 #include <QtWebKitWidgets>
+#include <QMutex>
+#include "innerwindow.h"
 
 QT_BEGIN_NAMESPACE
 class QTreeWidgetItem;
@@ -62,15 +64,25 @@ public:
     Window(QWidget *parent = 0);
     ~Window();
     void setUrl(const QUrl &url);
-
+//signals:
+    //void _startParse(QUrl);
 public slots:
     void on_webView_loadFinished();
+    void on_parse_finished(InnerWindow* innerWin);
 
 private:
     void examineChildElements(const QWebElement &parentElement,
-                              QTreeWidgetItem *parentItem);
+                              QTreeWidgetItem *treeRoot);
     QFile * outputFile;
     QTextStream * outputFileStream;
+    QLabel * label_for_besucht;
+    int besuchtCount;
+
+
+    //Functions
+    void parse_page(QString page_URL);
+
+
 };
 //! [Window class definition]
 

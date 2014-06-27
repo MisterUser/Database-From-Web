@@ -69,6 +69,12 @@
      </property>
      <item>
       <widget class="QTreeWidget" name="treeWidget">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <attribute name="headerVisible">
         <bool>false</bool>
        </attribute>
@@ -77,6 +83,21 @@
          <string notr="true">1</string>
         </property>
        </column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_for_besucht">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Besucht: </string>
+       </property>
       </widget>
      </item>
     </layout>
