@@ -39,11 +39,14 @@
 ****************************************************************************/
 //! [main program]
 #include <QApplication>
+#include <QtSql>
+#include <QDebug>
 #include "window.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
     Window window;
     window.show();
     window.setUrl(QUrl("http://www.hwk-do.de/index.php?id=727"));

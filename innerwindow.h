@@ -7,6 +7,7 @@
 #include <QtWidgets>
 #include <QtWebKitWidgets>
 #include <QMutex>
+#include <QtSql>
 
 QT_BEGIN_NAMESPACE
 class QTreeWidgetItem;
@@ -17,7 +18,7 @@ class InnerWindow : public QMainWindow, private Ui::Window
 {
     Q_OBJECT
 public:
-    InnerWindow(const QUrl &url, QTextStream * outputFS, QWidget *parent = 0);
+    InnerWindow(const QUrl &url, QSqlDatabase *openDataBase, QWidget *parent = 0);
     void setUrl(const QUrl &url);
 
 signals:
@@ -26,9 +27,17 @@ public slots:
     void on_webView_loadFinished();
 
 private:
-    void get_biz_info(const QWebElement &mainDOC);
-    QTextStream * outputFileStream;
+
+    //QTextStream * outputFileStream;
     bool secondTimeRound;
+    QSqlDatabase sql_db;
+
+
+    //Functions
+    void get_biz_info(const QWebElement &mainDOC);
+    void writeToDataBase(QString betrieb_Name, QString betrieb_Adresse, QString betrieb_PLZ, QString betrieb_StadtOrt, QString betrieb_Telefon, QString betrieb_Homepage, QString betrieb_Email, QString betrieb_Gewerk);
+    void parseAngaben(QString betriebAngabenIn);
+
 };
 
 #endif // INNERWINDOW_H

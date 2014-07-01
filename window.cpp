@@ -47,21 +47,43 @@ Window::Window(QWidget *parent)
     : QMainWindow(parent)
 {
     setupUi(this);
+    /*
     outputFile = new QFile("/home/knoll/workspace/domtraversal/log/Betrieb.log");
     outputFile->open(QIODevice::WriteOnly | QIODevice::Text);
     outputFileStream = new QTextStream(outputFile);
     *outputFileStream << "=======Habib's List=======\n\n";
     outputFileStream->flush();
+    */
+
     label_for_besucht = dockWidget->findChild<QLabel*>("label_for_besucht");
     besuchtCount = 0;
+
+
+    sql_db = QSqlDatabase::addDatabase("QMYSQL");
+    sql_db.setHostName("localhost");
+    sql_db.setDatabaseName("Dortmund_Betrieb");
+
+    if(sql_db.open())
+    {
+        qDebug() << "Database open";
+    }
+    else
+    {
+        qDebug() << "Error = " << sql_db.lastError();
+    }
+
+
+
+
 }
 //! [Window constructor]
 
 Window::~Window()
 {
-    outputFile->close();
-    delete outputFile;
-    delete outputFileStream;
+    //outputFile->close();
+    //delete outputFile;
+    //delete outputFileStream;
+    sql_db.close();
 }
 
 //! [set URL]
@@ -108,8 +130,6 @@ void Window::examineChildElements(const QWebElement &parentElement,
             }
         }
 
-        //parentItem->addChild(item);
-
         //subtrees
         examineChildElements(element, treeRoot);
 
@@ -122,20 +142,18 @@ void Window::examineChildElements(const QWebElement &parentElement,
 void Window::parse_page(QString page_URL)
 {
     page_URL.prepend("http://www.hwk-do.de/");
-    InnerWindow * innerWin = new InnerWindow(QUrl(page_URL), outputFileStream, NULL);
+    InnerWindow * innerWin = new InnerWindow(QUrl(page_URL), &sql_db ,NULL);
     connect(innerWin, SIGNAL(parsingFinished(InnerWindow*)), this, SLOT(on_parse_finished(InnerWindow*)));
-//    innerWin->close();
-
     return;
 }
 
 
 void Window::on_parse_finished(InnerWindow* innerWin)
 {
-
     innerWin->deleteLater();
-    *outputFileStream << "---------------"<<besuchtCount<<"------------------ "<< "\n\n";
+    //*outputFileStream << "---------------"<<besuchtCount<<"------------------ "<< "\n\n";
     label_for_besucht->setText("Besucht: " + QString::number(++besuchtCount));
     return;
 }
+
 

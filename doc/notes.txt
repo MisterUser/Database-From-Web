@@ -1,0 +1,16 @@
+For MySQL:
+
+in /usr/lib/x86_64-linux-gnu
+$ sudo ln -s libmysqlclient_r.so libmysqlclient_r.so.16   #this solves the inclusion problem (for database drivers)
+
+sudo service mysql [status/start/stop]
+
+$ sudo mysql
+mysql> grant all on Dortmund_Betrieb.* to 'knoll'@'localhost';
+
+then can run all commands as normal user:
+$ mysql
+mysql> show databases;
+mysql> delete from Angaben where name='Ive Got Worms';
+mysql> INSERT INTO Angaben VALUES('Ive Got Worms', 'Dingbanger Weg','43212','Aspen','076012341234','www.foo.com','reachme@foo.com','handwerke');
+

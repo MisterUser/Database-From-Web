@@ -47,6 +47,8 @@
 #include <QtWidgets>
 #include <QtWebKitWidgets>
 #include <QMutex>
+#include <QtSql>
+#include <QDebug>
 #include "innerwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -64,6 +66,7 @@ public:
     Window(QWidget *parent = 0);
     ~Window();
     void setUrl(const QUrl &url);
+
 //signals:
     //void _startParse(QUrl);
 public slots:
@@ -73,11 +76,12 @@ public slots:
 private:
     void examineChildElements(const QWebElement &parentElement,
                               QTreeWidgetItem *treeRoot);
-    QFile * outputFile;
-    QTextStream * outputFileStream;
+    //QFile * outputFile;
+    //QTextStream * outputFileStream;
     QLabel * label_for_besucht;
     int besuchtCount;
 
+    QSqlDatabase sql_db;
 
     //Functions
     void parse_page(QString page_URL);
