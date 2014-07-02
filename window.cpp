@@ -61,7 +61,7 @@ Window::Window(QWidget *parent)
 
     sql_db = QSqlDatabase::addDatabase("QMYSQL");
     sql_db.setHostName("localhost");
-    sql_db.setDatabaseName("Dortmund_Betrieb");
+    sql_db.setDatabaseName("Dort_Betrieb");
 
     if(sql_db.open())
     {
