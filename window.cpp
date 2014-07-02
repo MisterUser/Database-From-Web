@@ -51,7 +51,7 @@ Window::Window(QWidget *parent)
     outputFile = new QFile("/home/knoll/workspace/domtraversal/log/Betrieb.log");
     outputFile->open(QIODevice::WriteOnly | QIODevice::Text);
     outputFileStream = new QTextStream(outputFile);
-    *outputFileStream << "=======Habib's List=======\n\n";
+    *outputFileStream << "=======List=======\n\n";
     outputFileStream->flush();
     */
 
