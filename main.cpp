@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     Window window;
     window.show();
-    window.setUrl(QUrl("http://www.hwk-do.de/index.php?id=727"));
+    window.setUrl(QUrl("http://www.blah.com"));  //enter URL here.
     return app.exec();
 }
 //! [main program]
